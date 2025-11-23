@@ -58,12 +58,13 @@ public class UsuarioRepositoryImp implements UsuarioRepository {
     @Override
     public Integer update(Usuario usuario, Long id) {
         return this.jdbcClient
-                .sql("UPDATE usuarios SET nome = :nome, email = :email, login = :login, logradouro = :logradouro, numero = :numero, " +
+                .sql("UPDATE usuarios SET nome = :nome, email = :email, login = :login, senha = :senha, logradouro = :logradouro, numero = :numero, " +
                      "bairro = :bairro, cidade = :cidade, uf = :uf, cep = :cep, data_alteracao = :data_alteracao," +
                      " tipo_usuario = :tipo_usuario WHERE id = :id")
                 .param("nome", usuario.getNome())
                 .param("email", usuario.getEmail())
                 .param("login", usuario.getLogin())
+                .param("senha", usuario.getSenha())
                 .param("logradouro", usuario.getLogradouro())
                 .param("numero", usuario.getNumero())
                 .param("bairro", usuario.getBairro())
