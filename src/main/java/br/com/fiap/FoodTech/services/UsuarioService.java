@@ -26,6 +26,9 @@ public class UsuarioService {
     }
 
     public void saveUsuario(Usuario usuario) {
+
+        emailExists(usuario.getEmail());
+
         var save = this.usuarioRepository.save(usuario);
         Assert.state(save == 1, "Erro ao salvar usuário " + usuario.getNome());
     }
@@ -38,5 +41,11 @@ public class UsuarioService {
     public void deleteUsuario(Long id) {
         var delete = this.usuarioRepository.delete(id);
         Assert.state(delete == 1, "Usuário nao encontrado, ID: " + id);
+    }
+
+    public void emailExists(String email) {
+        if (this.usuarioRepository.emailExists(email)) {
+            throw new IllegalArgumentException("E-mail já cadastrado");
+        }
     }
 }

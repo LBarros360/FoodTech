@@ -47,6 +47,7 @@ public class UsuarioController {
     @PostMapping
     public ResponseEntity<Void> saveUsuario(@RequestBody Usuario usuario) {
         logger.info("POST -> /usuarios");
+
         this.usuarioService.saveUsuario(usuario);
         return ResponseEntity.status(201).build();
     }

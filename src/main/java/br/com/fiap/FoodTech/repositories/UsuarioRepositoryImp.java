@@ -82,4 +82,15 @@ public class UsuarioRepositoryImp implements UsuarioRepository {
                 .param("id", id)
                 .update();
     }
+
+    @Override
+    public boolean emailExists(String email) {
+        Integer count = this.jdbcClient
+                .sql("SELECT COUNT(*) FROM usuarios WHERE email = :email LIMIT 1")
+                .param("email", email)
+                .query(Integer.class)
+                .single();
+
+        return count != null && count > 0;
+    }
 }
