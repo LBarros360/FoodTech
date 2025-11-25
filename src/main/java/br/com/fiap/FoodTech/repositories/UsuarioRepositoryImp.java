@@ -25,12 +25,10 @@ public class UsuarioRepositoryImp implements UsuarioRepository {
                 .optional();
     }
 
-    @Override
-    public List<Usuario> findAll(int size, int offset) {
+    public List<Usuario> findUsersByName(String nome) {
         return this.jdbcClient
-                .sql("SELECT * FROM usuarios LIMIT :size OFFSET :offset")
-                .param("size", size)
-                .param("offset", offset)
+                .sql("SELECT * FROM usuarios WHERE LOWER(nome) LIKE LOWER(:nome)")
+                .param("nome", "%" + nome + "%")
                 .query(Usuario.class)
                 .list();
     }

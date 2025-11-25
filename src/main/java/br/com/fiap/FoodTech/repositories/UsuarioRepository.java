@@ -8,7 +8,7 @@ public interface UsuarioRepository {
 
     Optional<Usuario> findById(Long id);
 
-    List<Usuario> findAll(int size, int offset);
+    List<Usuario> findUsersByName(String nome);
 
     Integer save(Usuario usuario);
 

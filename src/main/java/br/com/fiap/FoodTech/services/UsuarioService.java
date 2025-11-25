@@ -21,9 +21,8 @@ public class UsuarioService {
         return this.usuarioRepository.findById(id);
     }
 
-    public List<Usuario> findAllUsuarios(int page, int size) {
-        int offset = (page -1) * size;
-        return this.usuarioRepository.findAll(size, offset);
+    public List<Usuario> findUsersByName (String nome) {
+        return this.usuarioRepository.findUsersByName(nome);
     }
 
     public void saveUsuario(Usuario usuario) {

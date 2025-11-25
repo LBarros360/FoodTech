@@ -34,12 +34,13 @@ public class UsuarioController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Usuario>> findAllUsuarios(
-            @RequestParam("page") int page,
-            @RequestParam("size") int size
+    public ResponseEntity<List<Usuario>> findUsersByName(
+            @RequestParam(required = false) String nome
     ) {
-        logger.info("/usuarios");
-        var usuarios = this.usuarioService.findAllUsuarios(page, size);
+
+        logger.info("/usuarios/" + nome);
+
+        var usuarios = this.usuarioService.findUsersByName(nome);
         return ResponseEntity.ok(usuarios);
     }
 
