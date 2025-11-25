@@ -24,15 +24,10 @@ public class SenhaController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> updateSenha(
+    public ResponseEntity<?> updateSenha(
             @Valid @RequestBody AtualizarSenhaDTO senhaDto
             ) {
         this.senhaService.updateSenha(senhaDto);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Login válido");
     }
-
-
-
-
-
 }

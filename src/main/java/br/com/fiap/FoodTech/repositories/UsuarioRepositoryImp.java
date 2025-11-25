@@ -93,4 +93,17 @@ public class UsuarioRepositoryImp implements UsuarioRepository {
 
         return count != null && count > 0;
     }
+
+    @Override
+    public boolean existsByLoginAndSenha(String login, String senha) {
+
+        Integer count = jdbcClient
+                .sql("SELECT COUNT(*) FROM usuarios WHERE login = :login AND senha = :senha")
+                .param("login", login)
+                .param("senha", senha)
+                .query(Integer.class)
+                .single();
+
+        return count != null && count > 0;
+    }
 }

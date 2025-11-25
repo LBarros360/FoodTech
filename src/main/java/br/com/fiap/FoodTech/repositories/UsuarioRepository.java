@@ -17,4 +17,6 @@ public interface UsuarioRepository {
     Integer delete(Long id);
 
     boolean emailExists(String email);
+
+    boolean existsByLoginAndSenha(String login, String senha);
 }
