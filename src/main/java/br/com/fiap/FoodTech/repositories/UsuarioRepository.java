@@ -19,4 +19,6 @@ public interface UsuarioRepository {
     boolean emailExists(String email);
 
     boolean existsByLoginAndSenha(String login, String senha);
+
+    List<Usuario> findAll();
 }

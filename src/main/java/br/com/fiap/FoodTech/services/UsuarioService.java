@@ -21,8 +21,11 @@ public class UsuarioService {
         return this.usuarioRepository.findById(id);
     }
 
-    public List<Usuario> findUsersByName (String nome) {
-        return this.usuarioRepository.findUsersByName(nome);
+    public List<Usuario> findUsersByName(String nome) {
+        if (nome == null || nome.isBlank()) {
+            return usuarioRepository.findAll();
+        }
+        return usuarioRepository.findUsersByName(nome);
     }
 
     public void saveUsuario(Usuario usuario) {
@@ -34,6 +37,11 @@ public class UsuarioService {
     }
 
     public void updateUsuario(Usuario usuario, Long id) {
+
+        if (this.usuarioRepository.findById(id).isEmpty()) {
+            throw new IllegalArgumentException("Usuário não encontrado: " + id);
+        }
+
         var update = this.usuarioRepository.update(usuario, id);
         Assert.state(update == 1, "Erro ao atualizar usuário " + usuario.getNome());
     }

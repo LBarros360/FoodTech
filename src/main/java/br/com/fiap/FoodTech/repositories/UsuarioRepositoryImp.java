@@ -86,7 +86,7 @@ public class UsuarioRepositoryImp implements UsuarioRepository {
     @Override
     public boolean emailExists(String email) {
         Integer count = this.jdbcClient
-                .sql("SELECT COUNT(*) FROM usuarios WHERE email = :email LIMIT 1")
+                .sql("SELECT COUNT(*) FROM usuarios WHERE email = :email")
                 .param("email", email)
                 .query(Integer.class)
                 .single();
@@ -105,5 +105,13 @@ public class UsuarioRepositoryImp implements UsuarioRepository {
                 .single();
 
         return count != null && count > 0;
+    }
+
+    @Override
+    public List<Usuario> findAll() {
+        return this.jdbcClient
+                .sql("SELECT * FROM usuarios")
+                .query(Usuario.class)
+                .list();
     }
 }

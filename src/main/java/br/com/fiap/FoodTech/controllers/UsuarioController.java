@@ -6,8 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/v1/usuarios")
@@ -22,55 +20,55 @@ public class UsuarioController {
     }
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Optional<Usuario>> findUsuarioById(
-            @PathVariable("id") Long id
-    ) {
-
-        logger.info("/usuarios/" + id);
-
-        var usuario = usuarioService.findById(id);
-        return ResponseEntity.ok(usuario);
-    }
-
     @GetMapping
-    public ResponseEntity<List<Usuario>> findUsersByName(
+    public ResponseEntity<?> findUsuarios(
+            @RequestParam(required = false) Long id,
             @RequestParam(required = false) String nome
     ) {
+        logger.info("GET -> /usuarios  id=" + id + " nome=" + nome);
 
-        logger.info("/usuarios/" + nome);
+        if (id != null) {
+            var usuario = usuarioService.findById(id);
 
-        var usuarios = this.usuarioService.findUsersByName(nome);
+            if (usuario.isPresent()) {
+                return ResponseEntity.ok(usuario.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        }
+
+        var usuarios = usuarioService.findUsersByName(nome);
         return ResponseEntity.ok(usuarios);
     }
 
     @PostMapping
     public ResponseEntity<Void> saveUsuario(@RequestBody Usuario usuario) {
-        logger.info("POST -> /usuarios");
 
-        this.usuarioService.saveUsuario(usuario);
+        logger.info("POST /v1/usuarios");
+
+        usuarioService.saveUsuario(usuario);
+
         return ResponseEntity.status(201).build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateUsuario(
-            @PathVariable("id") Long id,
-            @RequestBody Usuario usuario) {
+    public ResponseEntity<Void> updateUsuario(@PathVariable Long id,
+                                              @RequestBody Usuario usuario) {
 
-        logger.info("PUT -> /usuarios/" + id);
+        logger.info("PUT /v1/usuarios/{}", id);
 
-        this.usuarioService.updateUsuario(usuario, id);
-        return ResponseEntity.status(201).build();
+        usuarioService.updateUsuario(usuario, id);
 
+        return ResponseEntity.noContent().build(); // 204
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUsuario(
-        @PathVariable("id") Long id
-    ) {
-        logger.info("DELETE -> /usuarios/" + id);
+    public ResponseEntity<Void> deleteUsuario(@PathVariable Long id) {
 
-        this.usuarioService.deleteUsuario(id);
-        return ResponseEntity.status(201).build();
+        logger.info("DELETE /v1/usuarios/{}", id);
+
+        usuarioService.deleteUsuario(id);
+
+        return ResponseEntity.noContent().build(); // 204
     }
 }
