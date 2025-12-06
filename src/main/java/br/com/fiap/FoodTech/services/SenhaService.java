@@ -7,6 +7,8 @@ import br.com.fiap.FoodTech.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.time.LocalDateTime;
+
 @Service
 public class SenhaService {
 
@@ -18,7 +20,7 @@ public class SenhaService {
 
     public void updateSenha(AtualizarSenhaDTO dto) {
 
-        var usuario = usuarioRepository.findById(dto.usuarioId())
+        Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
 
         validatePassword(dto.novaSenha());
@@ -29,8 +31,9 @@ public class SenhaService {
 
         usuario.setSenha(dto.novaSenha());
 
-        var update = this.usuarioRepository.update(usuario, dto.usuarioId());
-        Assert.state(update == 1, "Erro ao atualizar a senha de  " + usuario.getNome());
+        int updated = usuarioRepository.updateSenha(usuario.getId(), usuario.getSenha());
+
+        Assert.state(updated == 1, "Erro ao atualizar a senha de " + usuario.getNome());
     }
 
     /**

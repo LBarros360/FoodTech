@@ -1,5 +1,6 @@
 package br.com.fiap.FoodTech.repositories;
 
+import br.com.fiap.FoodTech.dtos.UsuarioUpdateDTO;
 import br.com.fiap.FoodTech.entities.Usuario;
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +13,7 @@ public interface UsuarioRepository {
 
     Integer save(Usuario usuario);
 
-    Integer update(Usuario usuario, Long id);
+    Integer update(UsuarioUpdateDTO usuario, Long id);
 
     Integer delete(Long id);
 
@@ -21,4 +22,6 @@ public interface UsuarioRepository {
     boolean existsByLoginAndSenha(String login, String senha);
 
     List<Usuario> findAll();
+
+    int updateSenha(Long id, String novaSenha);
 }

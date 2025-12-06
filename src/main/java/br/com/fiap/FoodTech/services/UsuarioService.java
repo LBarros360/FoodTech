@@ -1,17 +1,22 @@
 package br.com.fiap.FoodTech.services;
 
+import br.com.fiap.FoodTech.dtos.UsuarioCreateDTO;
+import br.com.fiap.FoodTech.dtos.UsuarioUpdateDTO;
 import br.com.fiap.FoodTech.entities.Usuario;
+import br.com.fiap.FoodTech.exceptions.EmailAlreadyExistsException;
+import br.com.fiap.FoodTech.exceptions.UserNotFoundException;
 import br.com.fiap.FoodTech.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UsuarioService {
 
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
     public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
@@ -28,22 +33,38 @@ public class UsuarioService {
         return usuarioRepository.findUsersByName(nome);
     }
 
-    public void saveUsuario(Usuario usuario) {
+    public void saveUsuario(UsuarioCreateDTO dto) {
 
-        emailExists(usuario.getEmail());
+        emailExists(dto.email());
 
-        var save = this.usuarioRepository.save(usuario);
-        Assert.state(save == 1, "Erro ao salvar usuário " + usuario.getNome());
+        Usuario usuario = Usuario.builder()
+                .nome(dto.nome())
+                .email(dto.email())
+                .login(dto.login())
+                .senha(dto.senha())
+                .logradouro(dto.logradouro())
+                .numero(dto.numero())
+                .bairro(dto.bairro())
+                .cidade(dto.cidade())
+                .uf(dto.uf())
+                .cep(dto.cep())
+                .dataAlteracao(LocalDateTime.now())
+                .tipoUsuario(dto.tipoUsuario())
+                .build();
+
+        int saved = usuarioRepository.save(usuario);
+
+        Assert.state(saved == 1, "Erro ao salvar usuário: " + usuario.getNome());
     }
 
-    public void updateUsuario(Usuario usuario, Long id) {
+    public void updateUsuario(Long id, UsuarioUpdateDTO usuario) {
 
         if (this.usuarioRepository.findById(id).isEmpty()) {
-            throw new IllegalArgumentException("Usuário não encontrado: " + id);
+            throw new UserNotFoundException(id);
         }
 
         var update = this.usuarioRepository.update(usuario, id);
-        Assert.state(update == 1, "Erro ao atualizar usuário " + usuario.getNome());
+        Assert.state(update == 1, "Erro ao atualizar usuário " + usuario.nome());
     }
 
     public void deleteUsuario(Long id) {
@@ -53,7 +74,7 @@ public class UsuarioService {
 
     public void emailExists(String email) {
         if (this.usuarioRepository.emailExists(email)) {
-            throw new IllegalArgumentException("E-mail já cadastrado");
+            throw new EmailAlreadyExistsException(email);
         }
     }
 }
