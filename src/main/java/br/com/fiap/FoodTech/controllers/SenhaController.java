@@ -15,19 +15,23 @@ import jakarta.validation.Valid;
 @RequestMapping("/v1/senhas")
 public class SenhaController {
 
-    private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(SenhaController.class);
 
-    private SenhaService senhaService;
+    private final SenhaService senhaService;
 
     public SenhaController(SenhaService senhaService) {
         this.senhaService = senhaService;
     }
 
     @PutMapping
-    public ResponseEntity<?> updateSenha(
+    public ResponseEntity<Void> updateSenha(
             @Valid @RequestBody AtualizarSenhaDTO senhaDto
-            ) {
-        this.senhaService.updateSenha(senhaDto);
-        return ResponseEntity.ok("Login válido");
+    ) {
+        logger.info("PUT /v1/senhas");
+
+        senhaService.updateSenha(senhaDto);
+
+        return ResponseEntity.noContent().build(); // 204
     }
 }

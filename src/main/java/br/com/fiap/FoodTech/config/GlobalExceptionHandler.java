@@ -2,11 +2,13 @@ package br.com.fiap.FoodTech.config;
 
 import br.com.fiap.FoodTech.exceptions.EmailAlreadyExistsException;
 import br.com.fiap.FoodTech.exceptions.LoginInvalidoException;
+import br.com.fiap.FoodTech.exceptions.SenhaInvalidaException;
 import br.com.fiap.FoodTech.exceptions.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -99,6 +101,16 @@ public class GlobalExceptionHandler {
         detail.setProperty("timestamp", Instant.now());
 
         return detail;
+    }
+
+    // SENHA INVÁLIDA
+    @ExceptionHandler(SenhaInvalidaException.class)
+    public ResponseEntity<String> handleSenhaInvalida(
+            SenhaInvalidaException ex
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
     }
 
 

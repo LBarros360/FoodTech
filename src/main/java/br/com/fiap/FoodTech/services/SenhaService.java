@@ -2,60 +2,62 @@ package br.com.fiap.FoodTech.services;
 
 import br.com.fiap.FoodTech.dtos.AtualizarSenhaDTO;
 import br.com.fiap.FoodTech.entities.Usuario;
-import br.com.fiap.FoodTech.repositories.SenhaRepository;
+import br.com.fiap.FoodTech.exceptions.SenhaInvalidaException;
+import br.com.fiap.FoodTech.exceptions.UserNotFoundException;
 import br.com.fiap.FoodTech.repositories.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-
-import java.time.LocalDateTime;
 
 @Service
 public class SenhaService {
 
-    public UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public SenhaService(UsuarioRepository usuarioRepository) {
+    public SenhaService(
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder
+    ) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public void updateSenha(AtualizarSenhaDTO dto) {
 
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+                .orElseThrow(() ->
+                        new UserNotFoundException(dto.usuarioId())
+                );
 
         validatePassword(dto.novaSenha());
 
-        if (!dto.senhaAntiga().equals(usuario.getSenha())) {
-            throw new IllegalArgumentException("Senha antiga não confere.");
+        if (!passwordEncoder.matches(dto.senhaAntiga(), usuario.getSenha())) {
+            throw new SenhaInvalidaException("Senha antiga não confere.");
         }
 
-        usuario.setSenha(dto.novaSenha());
+        if (passwordEncoder.matches(dto.novaSenha(), usuario.getSenha())) {
+            throw new SenhaInvalidaException("A nova senha deve ser diferente da senha atual.");
+        }
 
-        int updated = usuarioRepository.updateSenha(usuario.getId(), usuario.getSenha());
+        String senhaCriptografada = passwordEncoder.encode(dto.novaSenha());
 
-        Assert.state(updated == 1, "Erro ao atualizar a senha de " + usuario.getNome());
+        int updated = usuarioRepository.updateSenha(
+                usuario.getId(),
+                senhaCriptografada
+        );
+
+        Assert.state(updated == 1,
+                "Erro ao atualizar a senha do usuário " + usuario.getId());
     }
 
-    /**
-     * Valida se a senha atende aos critérios mínimos.
-     * Neste exemplo:
-     * - mínimo de 8 caracteres
-     * - pelo menos uma letra maiúscula
-     * - pelo menos uma letra minúscula
-     * - pelo menos um número
-     * - pelo menos um caractere especial
-     */
-    public void validatePassword(String password) {
-
-        if (password == null || password.isBlank()) {
-            throw new IllegalArgumentException("A senha não pode ser vazia.");
-        }
+    private void validatePassword(String password) {
 
         String regex =
-                "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+                "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$";
 
         if (!password.matches(regex)) {
-            throw new IllegalArgumentException(
+            throw new SenhaInvalidaException(
                     "Senha inválida. A senha deve conter no mínimo 8 caracteres, " +
                             "com letras maiúsculas, minúsculas, números e caracteres especiais."
             );
