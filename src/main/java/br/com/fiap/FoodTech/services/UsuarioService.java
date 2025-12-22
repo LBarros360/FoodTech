@@ -1,11 +1,13 @@
 package br.com.fiap.FoodTech.services;
 
+import br.com.fiap.FoodTech.config.SecurityConfig;
 import br.com.fiap.FoodTech.dtos.UsuarioCreateDTO;
 import br.com.fiap.FoodTech.dtos.UsuarioUpdateDTO;
 import br.com.fiap.FoodTech.entities.Usuario;
 import br.com.fiap.FoodTech.exceptions.EmailAlreadyExistsException;
 import br.com.fiap.FoodTech.exceptions.UserNotFoundException;
 import br.com.fiap.FoodTech.repositories.UsuarioRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -17,9 +19,14 @@ import java.util.Optional;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder
+    ) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Optional<Usuario> findById(Long id) {
@@ -36,12 +43,12 @@ public class UsuarioService {
     public void saveUsuario(UsuarioCreateDTO dto) {
 
         emailExists(dto.email());
-
+        String senhaCriptografada = passwordEncoder.encode(dto.senha());
         Usuario usuario = Usuario.builder()
                 .nome(dto.nome())
                 .email(dto.email())
                 .login(dto.login())
-                .senha(dto.senha())
+                .senha(senhaCriptografada)
                 .logradouro(dto.logradouro())
                 .numero(dto.numero())
                 .bairro(dto.bairro())

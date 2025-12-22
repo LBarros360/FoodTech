@@ -36,6 +36,7 @@ public class UsuarioRepositoryImp implements UsuarioRepository {
 
     @Override
     public Integer save(Usuario usuario) {
+
         return this.jdbcClient
                 .sql("INSERT INTO usuarios (nome, email, login, senha, logradouro, numero, bairro, cidade, uf, cep, data_alteracao, tipo_usuario) " +
                         "VALUES (:nome, :email, :login, :senha, :logradouro, :numero, :bairro, :cidade, :uf, :cep, :data_alteracao, :tipo_usuario)")

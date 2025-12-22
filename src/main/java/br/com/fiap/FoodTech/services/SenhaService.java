@@ -15,10 +15,8 @@ public class SenhaService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public SenhaService(
-            UsuarioRepository usuarioRepository,
-            PasswordEncoder passwordEncoder
-    ) {
+    public SenhaService(UsuarioRepository usuarioRepository,
+                        PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -26,12 +24,12 @@ public class SenhaService {
     public void updateSenha(AtualizarSenhaDTO dto) {
 
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
-                .orElseThrow(() ->
-                        new UserNotFoundException(dto.usuarioId())
-                );
+                .orElseThrow(() -> new UserNotFoundException(dto.usuarioId()));
 
         validatePassword(dto.novaSenha());
 
+        System.out.println("Senha antiga informada: " + dto.senhaAntiga());
+        System.out.println("Senha atual do usuário: " + usuario.getSenha());
         if (!passwordEncoder.matches(dto.senhaAntiga(), usuario.getSenha())) {
             throw new SenhaInvalidaException("Senha antiga não confere.");
         }
@@ -42,16 +40,20 @@ public class SenhaService {
 
         String senhaCriptografada = passwordEncoder.encode(dto.novaSenha());
 
-        int updated = usuarioRepository.updateSenha(
-                usuario.getId(),
-                senhaCriptografada
-        );
+        int updated = usuarioRepository.updateSenha(usuario.getId(), senhaCriptografada);
 
-        Assert.state(updated == 1,
-                "Erro ao atualizar a senha do usuário " + usuario.getId());
+        if (updated != 1) {
+            throw new IllegalStateException(
+                    "Erro ao atualizar a senha do usuário " + usuario.getId()
+            );
+        }
     }
 
     private void validatePassword(String password) {
+
+        if (password == null || password.isBlank()) {
+            throw new SenhaInvalidaException("A senha não pode ser vazia.");
+        }
 
         String regex =
                 "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$";

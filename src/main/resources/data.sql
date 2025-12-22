@@ -3,7 +3,7 @@ CREATE TABLE usuarios (
     nome VARCHAR(255),
     email VARCHAR(255),
     login VARCHAR(50),
-    senha VARCHAR(8),
+    SENHA VARCHAR(255),
     logradouro VARCHAR(255),
     numero INTEGER,
     bairro VARCHAR(50),

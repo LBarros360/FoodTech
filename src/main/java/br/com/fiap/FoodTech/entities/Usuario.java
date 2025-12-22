@@ -30,4 +30,8 @@ public class Usuario {
 
     private LocalDateTime dataAlteracao;
     private TipoUsuario tipoUsuario;
+
+    public String getSenha() {
+        return senha;
+    }
 }
