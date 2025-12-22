@@ -19,9 +19,9 @@ public interface UsuarioRepository {
 
     boolean emailExists(String email);
 
-    boolean existsByLoginAndSenha(String login, String senha);
-
     List<Usuario> findAll();
 
     int updateSenha(Long id, String novaSenha);
+
+    Optional<Usuario> findByLogin(String login);
 }

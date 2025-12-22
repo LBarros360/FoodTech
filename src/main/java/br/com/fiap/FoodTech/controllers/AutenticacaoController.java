@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/auth")
 public class AutenticacaoController {
 
-    private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AutenticacaoController.class);
 
     private final AuthService authService;
 
@@ -22,19 +22,17 @@ public class AutenticacaoController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(
-            @Valid
-            @RequestBody LoginRequestDTO loginDto
-            ) {
+    public ResponseEntity<Void> login(
+            @Valid @RequestBody LoginRequestDTO loginDto
+    ) {
+        logger.info("Tentativa de login para usuário: {}", loginDto.login());
 
-        boolean valido = this.authService.validaLogin(loginDto);
-
-        if (valido) {
-            return ResponseEntity.ok().build();
+        if (!authService.validaLogin(loginDto)) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .build();
         }
 
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body("Login ou senha invalidos!");
+        return ResponseEntity.ok().build();
     }
 }

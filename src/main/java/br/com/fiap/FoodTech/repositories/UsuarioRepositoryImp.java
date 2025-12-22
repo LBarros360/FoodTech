@@ -96,18 +96,7 @@ public class UsuarioRepositoryImp implements UsuarioRepository {
         return count != null && count > 0;
     }
 
-    @Override
-    public boolean existsByLoginAndSenha(String login, String senha) {
 
-        Integer count = jdbcClient
-                .sql("SELECT COUNT(*) FROM usuarios WHERE login = :login AND senha = :senha")
-                .param("login", login)
-                .param("senha", senha)
-                .query(Integer.class)
-                .single();
-
-        return count != null && count > 0;
-    }
 
     @Override
     public List<Usuario> findAll() {
@@ -118,11 +107,24 @@ public class UsuarioRepositoryImp implements UsuarioRepository {
     }
 
     @Override
-    public int updateSenha(Long id, String novaSenha) {
+    public int updateSenha(Long id, String novaSenhaCriptografada) {
         return this.jdbcClient
-                .sql("UPDATE usuarios SET senha = :novaSenha, data_alteracao = NOW() WHERE id = :id")
-                .param("novaSenha", novaSenha)
+                .sql("""
+                UPDATE usuarios 
+                SET senha = :senha, data_alteracao = NOW() 
+                WHERE id = :id
+            """)
+                .param("senha", novaSenhaCriptografada)
                 .param("id", id)
                 .update();
+    }
+
+    @Override
+    public Optional<Usuario> findByLogin(String login) {
+        return this.jdbcClient
+                .sql("SELECT * FROM usuarios WHERE login = :login")
+                .param("login", login)
+                .query(Usuario.class)
+                .optional();
     }
 }
